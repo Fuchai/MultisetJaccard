@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Preprocessing {
+	
+	int numTerms;
+	
     public static String[] process(String filename) throws FileNotFoundException {
         File f = new File(filename);
         Scanner s = new Scanner(f);
@@ -20,5 +23,9 @@ public class Preprocessing {
         String[] ret= new String[list.size()];
         ret=list.toArray(ret);
         return ret;
+    }
+    
+    public int getNumTerms() {
+    	return numTerms;
     }
 }
