@@ -4,6 +4,6 @@ public class LSH {
     }
 
     public String[] nearDuplicatesOf(String docName){
-
+        return null;
     }
 }

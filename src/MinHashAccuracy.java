@@ -1,3 +1,5 @@
+import java.io.IOException;
+
 public class MinHashAccuracy {
     public static void main(String[] args) {
         int[] numPermutationsSet={400,600,800};
@@ -6,13 +8,18 @@ public class MinHashAccuracy {
         ) {
             for (double error:errorsSet
             ) {
-                MinHashAccuracy.accuracy("./resources/space", numPermutation, error);
+                try {
+                    MinHashAccuracy.accuracy("./resources/space", numPermutation, error);
+                } catch (IOException e) {
+                    System.out.println("Data file IO exception, ./resources/space ");
+                    e.printStackTrace();
+                }
             }
         }
     }
-    public static int accuracy(String folder, int numPermutations, double error) {
+    public static int accuracy(String folder, int numPermutations, double error) throws IOException {
         MinHashSimilarities mhs= new MinHashSimilarities(folder, numPermutations);
-        String[] allDocs = mhs.minHash.allDocs;
+        String[] allDocs = mhs.minHash.allDocs();
 
         double exJac;
         double appJac;

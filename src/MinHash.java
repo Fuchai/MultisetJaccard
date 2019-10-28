@@ -114,7 +114,7 @@ public class MinHash {
 
 	public HashMap<String, Integer> termDocumentFrequency(String fileName) throws IOException {
 		HashMap<String, Integer> map = new HashMap<>();
-		String[] words = pre.process(folder + File.separator + fileName);
+		String[] words = pre.process(fileName);
 		for (int i = 0; i < allTerms.size(); i++) {
 			map.put(allTerms.get(i), 0);
 		}
@@ -138,7 +138,7 @@ public class MinHash {
 		int[] doc = new int[numTerms];
 		for (int i = 0; i < contents.length; i++) {
 			if (contents[i].isFile()) {
-				HashMap<String, Integer> temp = termDocumentFrequency(contents[i].getName());
+				HashMap<String, Integer> temp = termDocumentFrequency(contents[i].getAbsolutePath());
 				for (int j = 0; j < numTerms; i++) {
 					doc[j] = temp.get(j);
 				}
@@ -168,10 +168,16 @@ public class MinHash {
 	public List<String> allTerms() throws FileNotFoundException {
 		List<String> s = new ArrayList<String>();
 		File[] contents = folder.listFiles();
-
+		int clen;
+		try {
+			clen=contents.length;
+		}catch(NullPointerException e){
+			System.out.println(folder +" has no files");
+			e.printStackTrace();
+		}
 		for (int i = 0; i < contents.length; i++) {
 			if (contents[i].isFile()) {
-				String[] words = pre.process(contents[i].getName());
+				String[] words = pre.process(contents[i].getAbsolutePath());
 				for (int j = 0; j < words.length; j++) {
 					if (!s.contains(words[j]))
 						s.add(words[j]);
