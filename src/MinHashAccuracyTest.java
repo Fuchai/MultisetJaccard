@@ -1,5 +1,7 @@
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class MinHashAccuracyTest {
@@ -12,7 +14,12 @@ class MinHashAccuracyTest {
              ) {
             for (double error:errorsSet
                  ) {
-                MinHashAccuracy.accuracy("./resources/space", numPermutation, error);
+                try {
+                    MinHashAccuracy.accuracy("./resources/space", numPermutation, error);
+                } catch (IOException e) {
+                    System.out.println("Data file IO exception, ./resources/space ");
+                    e.printStackTrace();
+                }
             }
         }
     }
