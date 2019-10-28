@@ -27,7 +27,7 @@ public class MinHash {
 	// Set of hash functions
 	public HashFunctionRan hashFunction;
 
-	Preprocessing pre = new Preprocessing();
+	Preprocessing pre;
 
 	List<String> allTerms;
 	
@@ -46,6 +46,7 @@ public class MinHash {
 		allTerms = allTerms();
 		numTerms = numTerms();
 		fileList = fileList();
+		pre = new Preprocessing(folder);
 	}
 	
 	private HashMap<String, Integer> fileList() {
@@ -74,7 +75,7 @@ public class MinHash {
 	 * @throws IOException
 	 */
 	public int[] minHashSig(String fileName) throws IOException {
-		String[] words = pre.process(folder + File.separator + fileName);
+		String[] words = pre.process(fileName);
 		int hashVal;
 		int[] minHashVals = new int[numPermutations];
 		Arrays.fill(minHashVals, Integer.MAX_VALUE);
@@ -114,7 +115,7 @@ public class MinHash {
 
 	public HashMap<String, Integer> termDocumentFrequency(String fileName) throws IOException {
 		HashMap<String, Integer> map = new HashMap<>();
-		String[] words = pre.process(folder + File.separator + fileName);
+		String[] words = pre.process(fileName);
 		for (int i = 0; i < allTerms.size(); i++) {
 			map.put(allTerms.get(i), 0);
 		}
@@ -168,7 +169,13 @@ public class MinHash {
 	public List<String> allTerms() throws FileNotFoundException {
 		List<String> s = new ArrayList<String>();
 		File[] contents = folder.listFiles();
-
+		int clen;
+		try {
+			clen=contents.length;
+		}catch(NullPointerException e){
+			System.out.println(folder +" has no files");
+			e.printStackTrace();
+		}
 		for (int i = 0; i < contents.length; i++) {
 			if (contents[i].isFile()) {
 				String[] words = pre.process(contents[i].getName());

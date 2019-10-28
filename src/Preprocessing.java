@@ -4,8 +4,13 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Preprocessing {
-    public static String[] process(String filename) throws FileNotFoundException {
-        File f = new File(filename);
+    private String folder;
+    public Preprocessing(String folder) {
+        this.folder=folder;
+    }
+
+    public String[] process(String fileName) throws FileNotFoundException {
+        File f = new File(folder + File.separator + fileName);
         Scanner s = new Scanner(f);
         ArrayList<String> list = new ArrayList<>();
 

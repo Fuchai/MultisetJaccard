@@ -1,10 +1,17 @@
+import java.io.IOException;
+
 public class MinHashTime {
 
     public static void main(String[] args) {
-        MinHashTime.timer("./resources/space",600);
+        try {
+            MinHashTime.timer("./resources/space",600);
+        } catch (IOException e) {
+            System.out.println("Data file IO exception, ./resources/space ");
+            e.printStackTrace();
+        }
     }
 
-    public static void timer(String folder, int numPermutations) {
+    public static void timer(String folder, int numPermutations) throws IOException {
         // construction timer
         long start = System.currentTimeMillis();
         MinHashSimilarities mhs= new MinHashSimilarities(folder, numPermutations);
@@ -15,7 +22,7 @@ public class MinHashTime {
 
         // exact timer
         start = System.currentTimeMillis();
-        String[] allDocs = mhs.minHash.allDocs;
+        String[] allDocs = mhs.minHash.allDocs();
         String f1;
         String f2;
         double exJac;
