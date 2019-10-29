@@ -27,7 +27,7 @@ public class MinHash {
 	// Set of hash functions
 	public HashFunctionRan hashFunction;
 
-	Preprocessing pre = new Preprocessing();
+	Preprocessing pre;
 
 	List<String> allTerms;
 	
@@ -46,6 +46,7 @@ public class MinHash {
 		allTerms = allTerms();
 		numTerms = numTerms();
 		fileList = fileList();
+		pre = new Preprocessing(folder);
 	}
 	
 	private HashMap<String, Integer> fileList() {
@@ -74,7 +75,7 @@ public class MinHash {
 	 * @throws IOException
 	 */
 	public int[] minHashSig(String fileName) throws IOException {
-		String[] words = pre.process(folder + File.separator + fileName);
+		String[] words = pre.process(fileName);
 		int hashVal;
 		int[] minHashVals = new int[numPermutations];
 		Arrays.fill(minHashVals, Integer.MAX_VALUE);
@@ -138,7 +139,7 @@ public class MinHash {
 		int[] doc = new int[numTerms];
 		for (int i = 0; i < contents.length; i++) {
 			if (contents[i].isFile()) {
-				HashMap<String, Integer> temp = termDocumentFrequency(contents[i].getAbsolutePath());
+				HashMap<String, Integer> temp = termDocumentFrequency(contents[i].getName());
 				for (int j = 0; j < numTerms; i++) {
 					doc[j] = temp.get(j);
 				}
@@ -177,7 +178,7 @@ public class MinHash {
 		}
 		for (int i = 0; i < contents.length; i++) {
 			if (contents[i].isFile()) {
-				String[] words = pre.process(contents[i].getAbsolutePath());
+				String[] words = pre.process(contents[i].getName());
 				for (int j = 0; j < words.length; j++) {
 					if (!s.contains(words[j]))
 						s.add(words[j]);
