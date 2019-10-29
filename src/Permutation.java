@@ -1,4 +1,5 @@
 // https://introcs.cs.princeton.edu/java/14array/Permutation.java.html
+// https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
 
 public class Permutation {
     private int[] mapping;
@@ -24,3 +25,4 @@ public class Permutation {
         return mapping[from];
     }
 }
+

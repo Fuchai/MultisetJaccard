@@ -26,7 +26,6 @@ public class MinHash {
     List<String> allUniqueTerms;
 
     // for fast lookup
-    // we should replace this if HashMap is not allowed
     HashMap<String, Integer> fileIndex;
     // hello:0, world:1, ...
     HashMap<String, Integer> uniqueWordIndex;
@@ -38,6 +37,7 @@ public class MinHash {
     int[] multiSetUnion;
 
     /**
+     * The constructor functions are semi-dependent on the call order.
      * @param folder
      * @param numPermutations
      */
@@ -53,27 +53,6 @@ public class MinHash {
 		constructPermutations();
 	}
 
-    private void constructFileIndex() {
-        fileIndex = fileList();
-    }
-
-    private HashMap<String, Integer> fileList() {
-        File[] contents = folder.listFiles();
-        HashMap<String, Integer> fileIndex = new HashMap<>();
-        for (int i = 0; i < contents.length; i++) {
-            if (contents[i].isFile()) {
-                fileIndex.put(contents[i].getName(), i);
-            }
-        }
-        return fileIndex;
-    }
-
-    /**
-     * @return
-     */
-    public String[] allDocs() {
-        return folder.list();
-    }
 
     /**
      * @param fileName
@@ -98,7 +77,8 @@ public class MinHash {
 				multiWordIndex=multiWordStartIndex[i]+j;
 				for (int k = 0; k < numPermutations; k++) {
 					permutedIndex=perms[k].to(multiWordIndex);
-					hashVal=(""+permutedIndex).hashCode();
+//					hashVal=(""+permutedIndex).hashCode();
+					hashVal=permutedIndex;
 					if (hashVal<minHashVals[k]){
 						minHashVals[k]=hashVal;
 					}
@@ -142,7 +122,6 @@ public class MinHash {
         return minHashMatrix;
     }
 
-    // TODO dinner here, need to modify termDocumentFrequency
     public int[] termDocumentFrequency(String fileName) {
         int[] currentTDF = new int[numUniqueTerms()];
         Arrays.fill(currentTDF, 0);
@@ -211,6 +190,29 @@ public class MinHash {
         return union;
     }
 
+
+	private void constructFileIndex() {
+		fileIndex = fileList();
+	}
+
+	private HashMap<String, Integer> fileList() {
+		File[] contents = folder.listFiles();
+		HashMap<String, Integer> fileIndex = new HashMap<>();
+		for (int i = 0; i < contents.length; i++) {
+			if (contents[i].isFile()) {
+				fileIndex.put(contents[i].getName(), i);
+			}
+		}
+		return fileIndex;
+	}
+
+	/**
+	 * @return
+	 */
+	public String[] allDocs() {
+		return folder.list();
+	}
+
     /***
      * Num of multiset terms, not unique
      * hello.0 hello.1 hello.2 count as three words here, but one in numUniqueTerms
@@ -234,7 +236,7 @@ public class MinHash {
 
     /**
      * All terms is an expensive operation. It is stored in memory and computed only once.
-     * Also it has side effect of initializing
+     * Also it has side effect of initializing two vars, see below
      *
      * @return
      */
