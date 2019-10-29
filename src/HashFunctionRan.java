@@ -5,8 +5,13 @@ class HashFunctionRan extends HashFunction {
     int a;
     int b;
 
-    public HashFunctionRan(int imageSize) {
-        this.prime = getPrime(imageSize);
+    /***
+     *
+     * @param lowerBoundSize the lower bound of the hash size.
+     *                       say lowerBoundSize=10, the next prime is 11, so the hash will have an image of 11
+     */
+    public HashFunctionRan(int lowerBoundSize) {
+        this.prime = getPrime(lowerBoundSize);
         this.a=ThreadLocalRandom.current().nextInt(0, prime);
         this.b=ThreadLocalRandom.current().nextInt(0, prime);
     }

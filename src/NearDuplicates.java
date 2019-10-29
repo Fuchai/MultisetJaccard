@@ -17,7 +17,7 @@ public class NearDuplicates {
 	 * @param simThreshold		Similarity threshold s, which is a double
 	 * @throws IOException 
 	 */
-    public NearDuplicates(String folder, int numPermutations, double simThreshold) throws IOException {
+    public NearDuplicates(String folder, int numPermutations, double simThreshold) {
     	this.simThreshold = simThreshold;
     	bandwidth=BandSizeCalculator.bestFactorR(numPermutations, simThreshold);
 		bands = numPermutations/bandwidth;

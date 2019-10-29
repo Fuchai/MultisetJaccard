@@ -10,7 +10,7 @@ public class MinHashSimilarities {
     static int[][] termDocMatrix;
     static int[][] mhMatrix;
 
-    public MinHashSimilarities(String folder, int numPermutations) throws IOException {
+    public MinHashSimilarities(String folder, int numPermutations) {
         minHash = new MinHash(folder, numPermutations);
         termDocMatrix= minHash.termDocumentMatrix();
         mhMatrix=minHash.minHashMatrix();
