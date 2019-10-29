@@ -9,13 +9,13 @@ public class MyHashTable {
     private int bytes=0;
 
     public MyHashTable(int size) {
-        this.size=size;
-        table = new LinkedNode[size];
-        hashFunction=new HashFunctionRan(this.size);
+    	hashFunction=new HashFunctionRan(size);
+        this.size=hashFunction.prime;
+        table = new LinkedNode[this.size];
     }
 
     public void add(String key, String value){
-        int index= (int) hashFunction.hash(key);
+        int index= hashFunction.hash(key);
         LinkedNode rootNode=table[index];
         if (rootNode == null){
             table[index]=new LinkedNode(key, value);
@@ -29,7 +29,7 @@ public class MyHashTable {
 
     public void add(String key){
         String value="";
-        int index= (int) hashFunction.hash(key);
+        int index= hashFunction.hash(key);
         LinkedNode rootNode=table[index];
         if (rootNode == null){
             table[index]=new LinkedNode(key, value);
@@ -41,7 +41,7 @@ public class MyHashTable {
     }
 
     public accessStringRet find(String key){
-        int index= (int) hashFunction.hash(key);
+        int index= hashFunction.hash(key);
         LinkedNode rootNode=table[index];
         if (rootNode == null){
             return new accessStringRet(null, 1);
