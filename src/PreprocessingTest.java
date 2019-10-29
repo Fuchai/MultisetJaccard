@@ -7,8 +7,9 @@ import static org.junit.jupiter.api.Assertions.*;
 class PreprocessingTest {
     @org.junit.jupiter.api.Test
     public void process() throws FileNotFoundException {
-        String filename="./resources/hello";
-        String[] words=Preprocessing.process(filename);
+        String filename="hello";
+        Preprocessing prep = new Preprocessing("./resources/");
+        String[] words=prep.process(filename);
         for (String word:words
              ) {
             assertTrue(!word.equals("the"));
