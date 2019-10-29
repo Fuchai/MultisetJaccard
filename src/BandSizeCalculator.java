@@ -47,7 +47,7 @@ public class BandSizeCalculator {
         }
         int ret= (apr-lower)>(higher-apr)? higher: lower;
         if (ret==0){
-            throw new ValueException("No factor exists for k");
+            throw new ValueException("Unable to generate LSH band size. No factor exists for k="+k);
         }
         return ret;
     }

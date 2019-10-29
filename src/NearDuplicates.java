@@ -4,7 +4,8 @@ import java.util.List;
 
 public class NearDuplicates {
 	
-	int bands;
+	final int bands;
+	final int bandwidth;
 	MinHashSimilarities minSim;
 	double simThreshold;
 	LSH lsh;
@@ -16,15 +17,16 @@ public class NearDuplicates {
 	 * @param simThreshold		Similarity threshold s, which is a double
 	 * @throws IOException 
 	 */
-    public NearDuplicates(String folder, int numPermutations, double simThreshold) throws IOException {
+    public NearDuplicates(String folder, int numPermutations, double simThreshold) {
     	this.simThreshold = simThreshold;
-    	bands = numPermutations/10;
-    	MinHash minhash = new MinHash(folder, numPermutations);
+    	bandwidth=BandSizeCalculator.bestFactorR(numPermutations, simThreshold);
+		bands = numPermutations/bandwidth;
+		MinHash minhash = new MinHash(folder, numPermutations);
     	minSim = new MinHashSimilarities(folder, numPermutations);
     	lsh = new LSH(minhash.minHashMatrix(), minhash.allDocs(), bands);
     }
     
-    public ArrayList<String> nearDuplciateDetector(String fileName) {
+    public ArrayList<String> nearDuplicateDetector(String fileName) {
     	List<String> nearDuplicates = lsh.nearDuplicatesOf(fileName);
     	ArrayList<String> sSimilar = new ArrayList<String>();
     	

@@ -6,7 +6,7 @@ class BandSizeCalculatorTest {
 
     @Test
     void approximateR() {
-        System.out.println(BandSizeCalculator.approximateR(200,0.9));
-        System.out.println(BandSizeCalculator.bestFactorR(200,0.9));
+        assertTrue(BandSizeCalculator.approximateR(200,0.9)==21);
+        assertTrue(BandSizeCalculator.bestFactorR(200,0.9)==20);
     }
 }
