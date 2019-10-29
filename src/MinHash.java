@@ -53,27 +53,6 @@ public class MinHash {
 		constructPermutations();
 	}
 
-    private void constructFileIndex() {
-        fileIndex = fileList();
-    }
-
-    private HashMap<String, Integer> fileList() {
-        File[] contents = folder.listFiles();
-        HashMap<String, Integer> fileIndex = new HashMap<>();
-        for (int i = 0; i < contents.length; i++) {
-            if (contents[i].isFile()) {
-                fileIndex.put(contents[i].getName(), i);
-            }
-        }
-        return fileIndex;
-    }
-
-    /**
-     * @return
-     */
-    public String[] allDocs() {
-        return folder.list();
-    }
 
     /**
      * @param fileName
@@ -98,7 +77,8 @@ public class MinHash {
 				multiWordIndex=multiWordStartIndex[i]+j;
 				for (int k = 0; k < numPermutations; k++) {
 					permutedIndex=perms[k].to(multiWordIndex);
-					hashVal=(""+permutedIndex).hashCode();
+//					hashVal=(""+permutedIndex).hashCode();
+					hashVal=permutedIndex;
 					if (hashVal<minHashVals[k]){
 						minHashVals[k]=hashVal;
 					}
@@ -210,6 +190,29 @@ public class MinHash {
         multiSetUnion = union;
         return union;
     }
+
+
+	private void constructFileIndex() {
+		fileIndex = fileList();
+	}
+
+	private HashMap<String, Integer> fileList() {
+		File[] contents = folder.listFiles();
+		HashMap<String, Integer> fileIndex = new HashMap<>();
+		for (int i = 0; i < contents.length; i++) {
+			if (contents[i].isFile()) {
+				fileIndex.put(contents[i].getName(), i);
+			}
+		}
+		return fileIndex;
+	}
+
+	/**
+	 * @return
+	 */
+	public String[] allDocs() {
+		return folder.list();
+	}
 
     /***
      * Num of multiset terms, not unique
