@@ -26,7 +26,6 @@ public class MinHash {
     List<String> allUniqueTerms;
 
     // for fast lookup
-    // we should replace this if HashMap is not allowed
     HashMap<String, Integer> fileIndex;
     // hello:0, world:1, ...
     HashMap<String, Integer> uniqueWordIndex;
@@ -38,6 +37,7 @@ public class MinHash {
     int[] multiSetUnion;
 
     /**
+     * The constructor functions are semi-dependent on the call order.
      * @param folder
      * @param numPermutations
      */
@@ -122,7 +122,6 @@ public class MinHash {
         return minHashMatrix;
     }
 
-    // TODO dinner here, need to modify termDocumentFrequency
     public int[] termDocumentFrequency(String fileName) {
         int[] currentTDF = new int[numUniqueTerms()];
         Arrays.fill(currentTDF, 0);
@@ -237,7 +236,7 @@ public class MinHash {
 
     /**
      * All terms is an expensive operation. It is stored in memory and computed only once.
-     * Also it has side effect of initializing
+     * Also it has side effect of initializing two vars, see below
      *
      * @return
      */
