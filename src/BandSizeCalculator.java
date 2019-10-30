@@ -32,14 +32,14 @@ public class BandSizeCalculator {
     static int bestFactorR(int k, double s){
         int apr=approximateR(k, s);
         int lower=0;
-        int higher=0;
+        int higher=k+1;
         for (int i = apr; i > 0; i--) {
             if ((k%i)==0){
                 lower=i;
                 break;
             }
         }
-        for (int i = apr; i < k; i++) {
+        for (int i = apr; i < k+1; i++) {
             if ((k%i)==0){
                 higher=i;
                 break;

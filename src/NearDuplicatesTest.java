@@ -10,9 +10,9 @@ class NearDuplicatesTest {
 
     @Test
     void nearDuplicateDetector() {
-        String folderPath="./resources/nearduplicatetest";
+        String folderPath="./resources/space";
         File folder=new File(folderPath);
-        NearDuplicates nd = new NearDuplicates(folderPath, 100, 0.9);
+        NearDuplicates nd = new NearDuplicates(folderPath, 500, 0.7);
         System.out.println("Near Duplicate Constructed");
         File[] allFiles=folder.listFiles();
         ArrayList<File> originalFiles = new ArrayList<>();
@@ -26,6 +26,8 @@ class NearDuplicatesTest {
         double falsePositive;
         double cumulativePrecision=0;
         double cumulativeRecall=0;
+        double trueSim=0;
+        int positiveCnt=0;
         ArrayList<String> positives;
         for (File originFile: originalFiles){
             truePositive=0;
@@ -33,17 +35,22 @@ class NearDuplicatesTest {
             positives=nd.nearDuplicateDetector(originFile.getName());
             for (String fname:positives
                  ) {
+                positiveCnt++;
                 if (fname.contains(originFile.getName())){
                     truePositive++;
                 }else{
                     falsePositive++;
                 }
+                trueSim+=nd.minSim.exactJaccard(originFile.getName(), fname);
             }
-            cumulativePrecision+= truePositive/(truePositive+falsePositive);
-            cumulativeRecall+= truePositive/8;
+            if (truePositive+falsePositive!=0){
+                cumulativePrecision+= truePositive/(truePositive+falsePositive);
+                cumulativeRecall+= truePositive/8;
+            }
         }
         System.out.println("Average precision:"+cumulativePrecision/originalFiles.size());
         System.out.println("Average recall:"+cumulativeRecall/originalFiles.size());
+        System.out.println("Average true Jaccard:"+trueSim/positiveCnt);
 
     }
 }
