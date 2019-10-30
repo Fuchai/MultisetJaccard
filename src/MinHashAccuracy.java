@@ -10,7 +10,7 @@ public class MinHashAccuracy {
             ) {
                 try {
                     System.out.println("Number of permutations: " +numPermutation);
-                    System.out.println("Error: "+error);
+                    System.out.println("Error margin: "+error);
                     MinHashAccuracy.accuracy("./resources/space", numPermutation, error);
                 } catch (IOException e) {
                     System.out.println("Data file IO exception, ./resources/space ");
