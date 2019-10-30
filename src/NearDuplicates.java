@@ -9,7 +9,7 @@ public class NearDuplicates {
 	MinHashSimilarities minSim;
 	double simThreshold;
 	LSH lsh;
-	double relaxationFactor=10;
+	double relaxationFactor=20;
 
 	/**
 	 * 
