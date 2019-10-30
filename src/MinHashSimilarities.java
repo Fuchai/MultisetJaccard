@@ -4,13 +4,13 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 
 public class MinHashSimilarities {
-    boolean debug=false;
+    boolean debug=true;
 
     MinHash minHash;
     static int[][] termDocMatrix;
     static int[][] mhMatrix;
 
-    public MinHashSimilarities(String folder, int numPermutations) throws IOException {
+    public MinHashSimilarities(String folder, int numPermutations) {
         minHash = new MinHash(folder, numPermutations);
         termDocMatrix= minHash.termDocumentMatrix();
         mhMatrix=minHash.minHashMatrix();
@@ -32,8 +32,10 @@ public class MinHashSimilarities {
         for (int i = 0; i < f1TermCount.length; i++) {
             int c1 = f1TermCount[i];
             int c2 = f2TermCount[i];
-            sumMin+=min(c1,c2);
-            sumMax+=max(c1,c2);
+            sumMin+= c1<c2? c1: c2;
+            sumMax+= c1>c2? c1: c2;
+//            sumMin+=min(c1,c2);
+//            sumMax+=max(c1,c2);
         }
         return sumMin/sumMax;
     }
