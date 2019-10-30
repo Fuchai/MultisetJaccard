@@ -277,9 +277,7 @@ public class MinHash {
         return numPermutations;
     }
 
-    /***
-     * has the side effect to construct multiSetUnion and multiWordStartIndex
-     */
+
     public void constructPermutations() {
         int numMultiTerms = numTerms();
         for (int i = 0; i < numPermutations; i++) {

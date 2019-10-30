@@ -10,9 +10,12 @@ class NearDuplicatesTest {
 
     @Test
     void nearDuplicateDetector() {
-        String folderPath="./resources/space";
+        // you must use the F17PA2 dataset.
+        // I have assumed that the conditional positive has 8 for each text.
+        // Or else you must do exact jaccard for all, which is certainly doable.
+        String folderPath="./resources/nearduplicatetest";
         File folder=new File(folderPath);
-        NearDuplicates nd = new NearDuplicates(folderPath, 500, 0.7);
+        NearDuplicates nd = new NearDuplicates(folderPath, 100, 0.8);
         System.out.println("Near Duplicate Constructed");
         File[] allFiles=folder.listFiles();
         ArrayList<File> originalFiles = new ArrayList<>();

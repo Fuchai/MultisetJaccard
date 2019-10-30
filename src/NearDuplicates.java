@@ -9,7 +9,8 @@ public class NearDuplicates {
 	MinHashSimilarities minSim;
 	double simThreshold;
 	LSH lsh;
-	
+	double relaxationFactor=10;
+
 	/**
 	 * 
 	 * @param folder 			Name of the folder containing documents
@@ -18,13 +19,20 @@ public class NearDuplicates {
 	 * @throws IOException 
 	 */
     public NearDuplicates(String folder, int numPermutations, double simThreshold) {
-    	this.simThreshold = simThreshold;
-    	bandwidth=BandSizeCalculator.bestFactorR(numPermutations, simThreshold);
+
+		this.simThreshold=simRelaxation(simThreshold);
+//		System.out.println(simRelaxation(simThreshold));
+    	bandwidth=BandSizeCalculator.bestFactorR(numPermutations, this.simThreshold);
 		bands = numPermutations/bandwidth;
 		MinHash minhash = new MinHash(folder, numPermutations);
     	minSim = new MinHashSimilarities(folder, numPermutations);
     	lsh = new LSH(minhash.minHashMatrix(), minhash.allDocs(), bands);
     }
+
+    public double simRelaxation(double wantedSim){
+		double propose= Math.exp(relaxationFactor*Math.log(wantedSim));
+		return propose>1e-5? propose: 1e-5;
+	}
     
     public ArrayList<String> nearDuplicateDetector(String fileName) {
     	List<String> nearDuplicates = lsh.nearDuplicatesOf(fileName);

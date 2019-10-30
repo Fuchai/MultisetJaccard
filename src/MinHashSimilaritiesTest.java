@@ -55,10 +55,6 @@ class MinHashSimilaritiesTest {
         System.out.println(approJ);
     }
 
-    @Test
-    void minHashSig() {
-    }
-
     private double mean(double[] vals){
         double sum =0;
         for (double val:vals
