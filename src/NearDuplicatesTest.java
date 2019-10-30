@@ -15,7 +15,7 @@ class NearDuplicatesTest {
         // Or else you must do exact jaccard for all, which is certainly doable.
         String folderPath="./resources/nearduplicatetest";
         File folder=new File(folderPath);
-        NearDuplicates nd = new NearDuplicates(folderPath, 100, 0.8);
+        NearDuplicates nd = new NearDuplicates(folderPath, 1024, 0.99);
         System.out.println("Near Duplicate Constructed");
         File[] allFiles=folder.listFiles();
         ArrayList<File> originalFiles = new ArrayList<>();
