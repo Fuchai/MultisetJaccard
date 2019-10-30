@@ -47,6 +47,11 @@ public class MyHashTable {
             return new accessStringRet(null, 1);
         } else{
             accessStringRet ret = rootNode.find(key);
+            while (rootNode.hasNext()) {
+            	rootNode = rootNode.getNext();
+            	if (rootNode.getKey().equals(key))
+            		ret.val = ret.val + "-~:" + rootNode.getValue();
+            }
             return ret;
         }
     }

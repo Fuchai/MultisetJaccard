@@ -5,7 +5,7 @@ import java.io.FileNotFoundException;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PreprocessingTest {
-    @org.junit.jupiter.api.Test
+    @Test
     public void process() throws FileNotFoundException {
         String filename="hello";
         Preprocessing prep = new Preprocessing("./resources/");
