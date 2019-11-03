@@ -15,7 +15,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class MinHash {
     boolean debug = true;
-
+    boolean big=false;
     File folder;
     int numPermutations;
     // Set of permutations
@@ -38,20 +38,21 @@ public class MinHash {
 
     /**
      * The constructor functions are semi-dependent on the call order.
+     *
      * @param folder
      * @param numPermutations
      */
     public MinHash(String folder, int numPermutations) {
         this.folder = new File(folder);
         this.numPermutations = numPermutations;
-        perms=new Permutation[numPermutations];
+        perms = new Permutation[numPermutations];
         pre = new Preprocessing(folder);
         constructAllUniqueWordIndex();
-		multiWordStartIndex=new int[numUniqueTerms()];
-		constructFileIndex();
+        multiWordStartIndex = new int[numUniqueTerms()];
+        constructFileIndex();
         constructMultiSetUnion();
-		constructPermutations();
-	}
+        constructPermutations();
+    }
 
 
     /**
@@ -65,26 +66,26 @@ public class MinHash {
         Arrays.fill(minHashVals, Integer.MAX_VALUE);
         Arrays.fill(duplicateCount, 0);
 
-		int hashVal;
-		if (debug){
-			assert (termVector.length==multiWordStartIndex.length);
-		}
+        int hashVal;
+        if (debug) {
+            assert (termVector.length == multiWordStartIndex.length);
+        }
 
-		int multiWordIndex;
-		int permutedIndex;
-		for (int i = 0; i < termVector.length; i++) {
-			for (int j = 0; j < termVector[i]; j++) {
-				multiWordIndex=multiWordStartIndex[i]+j;
-				for (int k = 0; k < numPermutations; k++) {
-					permutedIndex=perms[k].to(multiWordIndex);
+        int multiWordIndex;
+        int permutedIndex;
+        for (int i = 0; i < termVector.length; i++) {
+            for (int j = 0; j < termVector[i]; j++) {
+                multiWordIndex = multiWordStartIndex[i] + j;
+                for (int k = 0; k < numPermutations; k++) {
+                    permutedIndex = perms[k].to(multiWordIndex);
 //					hashVal=(""+permutedIndex).hashCode();
-					hashVal=permutedIndex;
-					if (hashVal<minHashVals[k]){
-						minHashVals[k]=hashVal;
-					}
-				}
-			}
-		}
+                    hashVal = permutedIndex;
+                    if (hashVal < minHashVals[k]) {
+                        minHashVals[k] = hashVal;
+                    }
+                }
+            }
+        }
 
 //
 //        for (int j = 0; j < words.length; j++) {
@@ -140,11 +141,18 @@ public class MinHash {
      * @return
      */
     public int[][] termDocumentMatrix() {
-        if (termDocumentMatrix != null) {
+        if (termDocumentMatrix != null && !big) {
             return termDocumentMatrix;
         }
         File[] allFiles = folder.listFiles();
-        int[][] termDocumentMatrix = new int[allFiles.length][numUniqueTerms()];
+        int[][] termDocumentMatrix;
+        try{
+            termDocumentMatrix = new int[allFiles.length][numUniqueTerms()];
+        }catch (OutOfMemoryError e){
+            System.out.println("You cannot access termDocumentMatrix, the dataset is too big");
+            big=true;
+            return null;
+        }
 
         for (int i = 0; i < allFiles.length; i++) {
             if (allFiles[i].isFile()) {
@@ -169,14 +177,15 @@ public class MinHash {
         int[] union = new int[tdm[0].length];
         Arrays.fill(union, 0);
         int multiSetUniqueWord = 0;
-        if (debug){
-        	assert(numUniqueTerms()==tdm[0].length);
-		}
+        if (debug) {
+            assert (numUniqueTerms() == tdm[0].length);
+        }
 
         for (int termi = 0; termi < tdm[0].length; termi++) {
             multiWordStartIndex[termi] = multiSetUniqueWord;
             for (int docj = 0; docj < tdm.length; docj++) {
-                union[termi] = Math.max(tdm[docj][termi], union[termi]);
+//                union[termi] = Math.max(tdm[docj][termi], union[termi]);
+                union[termi] = tdm[docj][termi]> union[termi]? tdm[docj][termi]:union[termi];
             }
             multiSetUniqueWord += union[termi];
         }
@@ -191,27 +200,27 @@ public class MinHash {
     }
 
 
-	private void constructFileIndex() {
-		fileIndex = fileList();
-	}
+    private void constructFileIndex() {
+        fileIndex = fileList();
+    }
 
-	private HashMap<String, Integer> fileList() {
-		File[] contents = folder.listFiles();
-		HashMap<String, Integer> fileIndex = new HashMap<>();
-		for (int i = 0; i < contents.length; i++) {
-			if (contents[i].isFile()) {
-				fileIndex.put(contents[i].getName(), i);
-			}
-		}
-		return fileIndex;
-	}
+    private HashMap<String, Integer> fileList() {
+        File[] contents = folder.listFiles();
+        HashMap<String, Integer> fileIndex = new HashMap<>();
+        for (int i = 0; i < contents.length; i++) {
+            if (contents[i].isFile()) {
+                fileIndex.put(contents[i].getName(), i);
+            }
+        }
+        return fileIndex;
+    }
 
-	/**
-	 * @return
-	 */
-	public String[] allDocs() {
-		return folder.list();
-	}
+    /**
+     * @return
+     */
+    public String[] allDocs() {
+        return folder.list();
+    }
 
     /***
      * Num of multiset terms, not unique

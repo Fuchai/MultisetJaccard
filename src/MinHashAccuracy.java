@@ -2,7 +2,7 @@ import java.io.IOException;
 
 public class MinHashAccuracy {
     public static void main(String[] args) {
-        int[] numPermutationsSet={400,600,800};
+         int[] numPermutationsSet={400,600,800};
         double[] errorsSet={0.04,0.07,0.09};
         for (int numPermutation:numPermutationsSet
         ) {
@@ -14,6 +14,7 @@ public class MinHashAccuracy {
                     MinHashAccuracy.accuracy("./resources/space", numPermutation, error);
                 } catch (IOException e) {
                     System.out.println("Data file IO exception, ./resources/space ");
+                    System.out.println();
                     e.printStackTrace();
                 }
             }

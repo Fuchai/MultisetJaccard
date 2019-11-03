@@ -13,7 +13,7 @@ class NearDuplicatesTest {
         // you must use the F17PA2 dataset.
         // I have assumed that the conditional positive has 8 for each text.
         // Or else you must do exact jaccard for all, which is certainly doable.
-        String folderPath="./resources/nearduplicatetest";
+        String folderPath="./resources/F17PA2";
         File folder=new File(folderPath);
         NearDuplicates nd = new NearDuplicates(folderPath, 1024, 0.99);
         System.out.println("Near Duplicate Constructed");
