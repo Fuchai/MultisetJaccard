@@ -1,4 +1,6 @@
 
+import jdk.nashorn.internal.runtime.regexp.joni.exception.ValueException;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -15,7 +17,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class MinHash {
     boolean debug = true;
-
+    boolean big=false;
     File folder;
     int numPermutations;
     // Set of permutations
@@ -38,20 +40,21 @@ public class MinHash {
 
     /**
      * The constructor functions are semi-dependent on the call order.
+     *
      * @param folder
      * @param numPermutations
      */
     public MinHash(String folder, int numPermutations) {
         this.folder = new File(folder);
         this.numPermutations = numPermutations;
-        perms=new Permutation[numPermutations];
+        perms = new Permutation[numPermutations];
         pre = new Preprocessing(folder);
         constructAllUniqueWordIndex();
-		multiWordStartIndex=new int[numUniqueTerms()];
-		constructFileIndex();
+        constructFileIndex();
+        termDocumentMatrix= termDocumentMatrix();
         constructMultiSetUnion();
-		constructPermutations();
-	}
+        constructPermutations();
+    }
 
 
     /**
@@ -59,32 +62,38 @@ public class MinHash {
      * @return
      */
     public int[] minHashSig(String fileName) {
-        int[] termVector = termDocumentMatrix[fileIndex.get(fileName)];
+        int[] termVector;
+        if (!big){
+            termVector = termDocumentMatrix[fileIndex.get(fileName)];
+        }else{
+            termVector = termDocumentFrequency(fileName);
+        }
+
         int[] minHashVals = new int[numPermutations];
-        int[] duplicateCount = new int[numUniqueTerms()];
+//        int[] duplicateCount = new int[numUniqueTerms()];
         Arrays.fill(minHashVals, Integer.MAX_VALUE);
-        Arrays.fill(duplicateCount, 0);
+//        Arrays.fill(duplicateCount, 0);
 
-		int hashVal;
-		if (debug){
-			assert (termVector.length==multiWordStartIndex.length);
-		}
+        int hashVal;
+        if (debug) {
+            assert (termVector.length == multiWordStartIndex.length);
+        }
 
-		int multiWordIndex;
-		int permutedIndex;
-		for (int i = 0; i < termVector.length; i++) {
-			for (int j = 0; j < termVector[i]; j++) {
-				multiWordIndex=multiWordStartIndex[i]+j;
-				for (int k = 0; k < numPermutations; k++) {
-					permutedIndex=perms[k].to(multiWordIndex);
+        int multiWordIndex;
+        int permutedIndex;
+        for (int i = 0; i < termVector.length; i++) {
+            for (int j = 0; j < termVector[i]; j++) {
+                multiWordIndex = multiWordStartIndex[i] + j;
+                for (int k = 0; k < numPermutations; k++) {
+                    permutedIndex = perms[k].to(multiWordIndex);
 //					hashVal=(""+permutedIndex).hashCode();
-					hashVal=permutedIndex;
-					if (hashVal<minHashVals[k]){
-						minHashVals[k]=hashVal;
-					}
-				}
-			}
-		}
+                    hashVal = permutedIndex;
+                    if (hashVal < minHashVals[k]) {
+                        minHashVals[k] = hashVal;
+                    }
+                }
+            }
+        }
 
 //
 //        for (int j = 0; j < words.length; j++) {
@@ -123,6 +132,9 @@ public class MinHash {
     }
 
     public int[] termDocumentFrequency(String fileName) {
+        if (termDocumentMatrix!=null){
+            return termDocumentMatrix[getIndex(fileName)];
+        }
         int[] currentTDF = new int[numUniqueTerms()];
         Arrays.fill(currentTDF, 0);
         String[] words = pre.process(fileName);
@@ -140,11 +152,20 @@ public class MinHash {
      * @return
      */
     public int[][] termDocumentMatrix() {
-        if (termDocumentMatrix != null) {
+        if (termDocumentMatrix != null || big) {
             return termDocumentMatrix;
         }
         File[] allFiles = folder.listFiles();
-        int[][] termDocumentMatrix = new int[allFiles.length][numUniqueTerms()];
+        int[][] termDocumentMatrix;
+        try{
+            termDocumentMatrix = new int[allFiles.length][numUniqueTerms()];
+        }catch (OutOfMemoryError e){
+            System.out.println("I cannot generate termDocumentMatrix, JVM out of memory. " +
+                    "I will try to compute MinHash still by accessing files directly.");
+            big=true;
+            this.termDocumentMatrix=null;
+            return null;
+        }
 
         for (int i = 0; i < allFiles.length; i++) {
             if (allFiles[i].isFile()) {
@@ -162,56 +183,93 @@ public class MinHash {
      */
 
     public int[] constructMultiSetUnion() {
+        multiWordStartIndex = new int[numUniqueTerms()];
+        int nut=numUniqueTerms();
         if (multiSetUnion != null) {
             return multiSetUnion;
         }
-        int[][] tdm = termDocumentMatrix();
-        int[] union = new int[tdm[0].length];
-        Arrays.fill(union, 0);
-        int multiSetUniqueWord = 0;
-        if (debug){
-        	assert(numUniqueTerms()==tdm[0].length);
-		}
+        if (!big){
+            int[][] tdm = termDocumentMatrix();
+            int[] union = new int[tdm[0].length];
+            Arrays.fill(union, 0);
+            int multiSetUniqueWord = 0;
+            if (debug) {
+                assert (nut == tdm[0].length);
+            }
 
-        for (int termi = 0; termi < tdm[0].length; termi++) {
-            multiWordStartIndex[termi] = multiSetUniqueWord;
-            for (int docj = 0; docj < tdm.length; docj++) {
-                union[termi] = Math.max(tdm[docj][termi], union[termi]);
+            for (int termi = 0; termi < tdm[0].length; termi++) {
+                multiWordStartIndex[termi] = multiSetUniqueWord;
+                for (int docj = 0; docj < tdm.length; docj++) {
+//                union[termi] = Math.max(tdm[docj][termi], union[termi]);
+                    union[termi] = tdm[docj][termi]> union[termi]? tdm[docj][termi]:union[termi];
+                }
+                multiSetUniqueWord += union[termi];
             }
-            multiSetUniqueWord += union[termi];
-        }
-        if (debug) {
-            for (int termj = 0; termj < tdm[0].length; termj++) {
-                // all terms must have at least one apperance in one of the documents
-                assert (union[termj] > 0);
+            if (debug) {
+                for (int termj = 0; termj < tdm[0].length; termj++) {
+                    // all terms must have at least one apperance in one of the documents
+                    assert (union[termj] > 0);
+                }
             }
+            multiSetUnion = union;
+            return union;
+        }else{
+            // if term document matrix is too big
+            int[] union = new int[nut];
+            Arrays.fill(union, 0);
+            // One pass through all files to collect the maximum frequency of each word
+            for (String fileName: allDocs()
+                 ) {
+                int[] thisFrequency = termDocumentFrequency(fileName);
+                for (int i = 0; i < thisFrequency.length; i++) {
+                    if (union[i]<thisFrequency[i]){
+                        union[i]=thisFrequency[i];
+                    }
+                }
+            }
+
+            // Construct multiWordStartIndex
+            int multiSetUniqueWord = 0;
+            for (int i = 0; i < nut; i++) {
+                multiWordStartIndex[i] = multiSetUniqueWord;
+                multiSetUniqueWord+=union[i];
+            }
+
+            if (debug) {
+                for (int termj = 0; termj < nut; termj++) {
+                    // all terms must have at least one apperance in one of the documents
+                    if (union[termj] <= 0){
+                        throw new ValueException("Term does not appear?");
+                    }
+                }
+            }
+            multiSetUnion = union;
+            return union;
         }
-        multiSetUnion = union;
-        return union;
     }
 
 
-	private void constructFileIndex() {
-		fileIndex = fileList();
-	}
+    private void constructFileIndex() {
+        fileIndex = fileList();
+    }
 
-	private HashMap<String, Integer> fileList() {
-		File[] contents = folder.listFiles();
-		HashMap<String, Integer> fileIndex = new HashMap<>();
-		for (int i = 0; i < contents.length; i++) {
-			if (contents[i].isFile()) {
-				fileIndex.put(contents[i].getName(), i);
-			}
-		}
-		return fileIndex;
-	}
+    private HashMap<String, Integer> fileList() {
+        File[] contents = folder.listFiles();
+        HashMap<String, Integer> fileIndex = new HashMap<>();
+        for (int i = 0; i < contents.length; i++) {
+            if (contents[i].isFile()) {
+                fileIndex.put(contents[i].getName(), i);
+            }
+        }
+        return fileIndex;
+    }
 
-	/**
-	 * @return
-	 */
-	public String[] allDocs() {
-		return folder.list();
-	}
+    /**
+     * @return
+     */
+    public String[] allDocs() {
+        return folder.list();
+    }
 
     /***
      * Num of multiset terms, not unique
@@ -277,9 +335,7 @@ public class MinHash {
         return numPermutations;
     }
 
-    /***
-     * has the side effect to construct multiSetUnion and multiWordStartIndex
-     */
+
     public void constructPermutations() {
         int numMultiTerms = numTerms();
         for (int i = 0; i < numPermutations; i++) {

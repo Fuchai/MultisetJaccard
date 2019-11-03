@@ -52,7 +52,7 @@ public class MinHashTime {
         }
         end = System.currentTimeMillis();
         sec = (end - start) / 1000.0;
-        System.out.println("Time taken to estimate Jaccard similarity: "+sec + " seconds");
+        System.out.println("Time taken to approximate Jaccard similarity: "+sec + " seconds");
 
     }
 }
