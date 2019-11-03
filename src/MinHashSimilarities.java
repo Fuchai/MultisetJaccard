@@ -17,11 +17,8 @@ public class MinHashSimilarities {
     }
 
     public double exactJaccard(String file1, String file2){
-        int f1index=minHash.getIndex(file1);
-        int f2index=minHash.getIndex(file2);
-
-        int[] f1TermCount=termDocMatrix[f1index];
-        int[] f2TermCount=termDocMatrix[f2index];
+        int[] f1TermCount=minHash.termDocumentFrequency(file1);
+        int[] f2TermCount=minHash.termDocumentFrequency(file2);
 
         if(debug){
             assert (f1TermCount.length==f2TermCount.length);

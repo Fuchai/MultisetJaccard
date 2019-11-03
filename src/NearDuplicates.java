@@ -24,9 +24,9 @@ public class NearDuplicates {
 //		System.out.println(simRelaxation(simThreshold));
     	bandwidth=BandSizeCalculator.bestFactorR(numPermutations, this.simThreshold);
 		bands = numPermutations/bandwidth;
-		MinHash minhash = new MinHash(folder, numPermutations);
     	minSim = new MinHashSimilarities(folder, numPermutations);
-    	lsh = new LSH(minhash.minHashMatrix(), minhash.allDocs(), bands);
+		MinHash minhash = minSim.minHash;
+		lsh = new LSH(minhash.minHashMatrix(), minhash.allDocs(), bands);
     }
 
     public double simRelaxation(double wantedSim){
